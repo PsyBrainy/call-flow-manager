@@ -1,0 +1,6 @@
+FROM redis:latest
+
+COPY init-redis.sh /init-redis.sh
+RUN chmod +x /init-redis.sh
+
+ENTRYPOINT ["sh", "-c", "redis-server --appendonly yes & sleep 5 && /init-redis.sh && tail -f /dev/null"]
