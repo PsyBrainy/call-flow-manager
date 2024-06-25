@@ -1,8 +1,8 @@
 package com.psybrainy.CallFlowManager.call.application.usecase;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class DispatchCallUseCase {
 
 }
