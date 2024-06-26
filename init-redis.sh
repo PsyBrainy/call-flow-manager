@@ -8,7 +8,7 @@ done
 
 # Añadir empleados de diferentes tipos
 for i in {1..5}; do
-  redis-cli set "employee:$i:OPERADOR" true
+  redis-cli set "employee:$i:OPERATOR" true
 done
 
 for i in {6..8}; do
