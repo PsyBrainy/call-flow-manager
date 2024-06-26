@@ -6,7 +6,12 @@ import com.psybrainy.CallFlowManager.call.domain.Call;
 import com.psybrainy.CallFlowManager.call.domain.Employee;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+
 import static com.psybrainy.CallFlowManager.call.domain.EmployeeType.*;
 
 @Component
@@ -14,10 +19,12 @@ public class DispatchCallUseCase {
 
     private final GetAvailableEmployeeByType getAvailableEmployeeByType;
     private final HandleCall handleCall;
+    private final BlockingQueue<Call> callQueue = new LinkedBlockingQueue<>();
 
     public DispatchCallUseCase(GetAvailableEmployeeByType getAvailableEmployeeByType, HandleCall handleCall) {
         this.getAvailableEmployeeByType = getAvailableEmployeeByType;
         this.handleCall = handleCall;
+        startQueueProcessor();
     }
 
     @Async
@@ -28,7 +35,8 @@ public class DispatchCallUseCase {
                 handleCall.execute(call, employee);
                 return "Call dispatched successfully";
             } else {
-                return "No employee available to handle the call";
+                callQueue.offer(call);
+                return "No employee available, call added to the queue";
             }
         });
     }
@@ -51,5 +59,23 @@ public class DispatchCallUseCase {
         }
 
         return null;
+    }
+
+    @Async
+    public void startQueueProcessor() {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            while (true) {
+                try {
+                    Call call = callQueue.take();
+                    Employee employee;
+                    while ((employee = getAvailableEmployee()) == null) {
+                        Thread.sleep(1000);
+                    }
+                    handleCall.execute(call, employee);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
     }
 }

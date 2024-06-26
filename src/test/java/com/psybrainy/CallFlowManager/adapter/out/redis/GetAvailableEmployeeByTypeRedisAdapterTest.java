@@ -5,6 +5,7 @@ import com.psybrainy.CallFlowManager.call.application.port.out.GetAvailableEmplo
 import com.psybrainy.CallFlowManager.call.domain.Employee;
 import com.psybrainy.CallFlowManager.call.domain.Operator;
 import com.psybrainy.CallFlowManager.config.RedisTestConfig;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +32,17 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
     void setUp() {
         adapter = new GetAvailableEmployeeByTypeRedisAdapter(redisTemplateTest);
 
+        ValueOperations<String, Boolean> valueOperations = redisTemplateTest.opsForValue();
+        valueOperations.set("employee:1:OPERATOR", true);
+        valueOperations.set("employee:2:OPERATOR", false);
+    }
+
+    @AfterEach
+    public void tearDown() {
         Set<String> keys = redisTemplateTest.keys("employee:*:OPERATOR");
         if (keys != null) {
             keys.forEach(redisTemplateTest::delete);
         }
-
-        ValueOperations<String, Boolean> valueOperations = redisTemplateTest.opsForValue();
-        valueOperations.set("employee:1:OPERATOR", true);
-        valueOperations.set("employee:2:OPERATOR", false);
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.psybrainy.CallFlowManager.call.application.port.out.HandleCall;
 import com.psybrainy.CallFlowManager.call.application.usecase.DispatchCallUseCase;
 import com.psybrainy.CallFlowManager.call.domain.Call;
 import com.psybrainy.CallFlowManager.config.RedisTestConfig;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -47,11 +48,6 @@ public class DispatchCallUseCaseTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        Set<String> keys = redisTemplate.keys("employee:*");
-        if (keys != null) {
-            keys.forEach(redisTemplate::delete);
-        }
-
         ValueOperations<String, Boolean> valueOperations = redisTemplate.opsForValue();
         valueOperations.set("employee:1:OPERATOR", true);
         valueOperations.set("employee:2:OPERATOR", true);
@@ -70,6 +66,14 @@ public class DispatchCallUseCaseTest {
         doNothing().when(handleCall).execute(any(Call.class), any());
     }
 
+    @AfterEach
+    public void tearDown() {
+        Set<String> keys = redisTemplate.keys("employee:*");
+        if (keys != null) {
+            keys.forEach(redisTemplate::delete);
+        }
+    }
+
     @Test
     void testDispatchCall() throws ExecutionException, InterruptedException {
 
@@ -79,7 +83,13 @@ public class DispatchCallUseCaseTest {
 
         for (int i = 0; i < 10; i++) {
             Call mockCall = new Call();
-            CompletableFuture<String> future = dispatchCallUseCase.dispatchCall(mockCall);
+            CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+                try {
+                    return dispatchCallUseCase.dispatchCall(mockCall).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+            }, executorService);
             futures.add(future);
         }
 
@@ -90,5 +100,28 @@ public class DispatchCallUseCaseTest {
         verify(handleCall, times(10)).execute(any(Call.class), any());
 
         executorService.shutdown();
+    }
+
+    @Test
+    void testCallQueueingAndProcessing() throws ExecutionException, InterruptedException {
+
+        ValueOperations<String, Boolean> valueOperations = redisTemplate.opsForValue();
+        Set<String> keys = redisTemplate.keys("employee:*");
+        if (keys != null) {
+            for (String key : keys) {
+                valueOperations.set(key, false);
+            }
+        }
+
+        Call mockCall = new Call();
+        CompletableFuture<String> future = dispatchCallUseCase.dispatchCall(mockCall);
+
+        assertEquals("No employee available, call added to the queue", future.get());
+
+        valueOperations.set("employee:1:OPERATOR", true);
+
+        Thread.sleep(2000);
+
+        verify(handleCall, times(1)).execute(any(Call.class), any());
     }
 }
