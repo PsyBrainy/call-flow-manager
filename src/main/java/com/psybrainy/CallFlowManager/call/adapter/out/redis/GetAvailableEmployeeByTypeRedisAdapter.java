@@ -2,6 +2,8 @@ package com.psybrainy.CallFlowManager.call.adapter.out.redis;
 
 import com.psybrainy.CallFlowManager.call.application.port.out.GetAvailableEmployeeByType;
 import com.psybrainy.CallFlowManager.call.domain.EmployeeType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +17,8 @@ public class GetAvailableEmployeeByTypeRedisAdapter implements GetAvailableEmplo
     private final RedisTemplate<String, Boolean> redisTemplate;
     private final Lock lock = new ReentrantLock();
 
-    public GetAvailableEmployeeByTypeRedisAdapter(RedisTemplate<String, Boolean> redisTemplate) {
+    @Autowired
+    public GetAvailableEmployeeByTypeRedisAdapter(  RedisTemplate<String, Boolean> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
@@ -33,6 +36,10 @@ public class GetAvailableEmployeeByTypeRedisAdapter implements GetAvailableEmplo
                     }
                 }
             }
+            return null;
+        } catch (Exception e) {
+            //TODO
+            e.printStackTrace();
             return null;
         }finally {
             lock.unlock();
