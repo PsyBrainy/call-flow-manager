@@ -5,7 +5,6 @@ import com.psybrainy.CallFlowManager.call.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -37,7 +36,7 @@ public class GetAvailableEmployeeByTypeRedisAdapter implements GetAvailableEmplo
                                 .replace(":" + type.name(), "");
 
                         return switch (type) {
-                            case OPERADOR -> new Operator(idEmployee);
+                            case OPERATOR -> new Operator(idEmployee);
                             case SUPERVISOR -> new Supervisor(idEmployee);
                             case DIRECTOR -> new Director(idEmployee);
                             default -> null;

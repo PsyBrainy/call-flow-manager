@@ -1,7 +1,7 @@
 package com.psybrainy.CallFlowManager.call.domain;
 
 public enum EmployeeType {
-    OPERADOR,
+    OPERATOR,
     SUPERVISOR,
     DIRECTOR
 }

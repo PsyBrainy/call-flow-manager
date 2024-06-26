@@ -9,15 +9,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.Set;
 
-import static com.psybrainy.CallFlowManager.call.domain.EmployeeType.OPERADOR;
+import static com.psybrainy.CallFlowManager.call.domain.EmployeeType.OPERATOR;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes = {RedisTestConfig.class})
+@SpringBootTest
+@Import(RedisTestConfig.class)
 public class GetAvailableEmployeeByTypeRedisAdapterTest {
 
     @Autowired
@@ -29,33 +31,33 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
     void setUp() {
         adapter = new GetAvailableEmployeeByTypeRedisAdapter(redisTemplateTest);
 
-        Set<String> keys = redisTemplateTest.keys("employee:*:OPERADOR");
+        Set<String> keys = redisTemplateTest.keys("employee:*:OPERATOR");
         if (keys != null) {
             keys.forEach(redisTemplateTest::delete);
         }
 
         ValueOperations<String, Boolean> valueOperations = redisTemplateTest.opsForValue();
-        valueOperations.set("employee:1:OPERADOR", true);
-        valueOperations.set("employee:2:OPERADOR", false);
+        valueOperations.set("employee:1:OPERATOR", true);
+        valueOperations.set("employee:2:OPERATOR", false);
     }
 
     @Test
     void testExecute() {
-        Employee result = adapter.execute(OPERADOR);
+        Employee result = adapter.execute(OPERATOR);
 
         assertNotNull(result);
         assertInstanceOf(Operator.class, result);
         ValueOperations<String, Boolean> valueOperations = redisTemplateTest.opsForValue();
-        assertEquals(Boolean.FALSE, valueOperations.get("employee:1:OPERADOR"));
+        assertEquals(Boolean.FALSE, valueOperations.get("employee:1:OPERATOR"));
     }
 
     @Test
     void testNoAvailableEmployee() {
         ValueOperations<String, Boolean> valueOperations = redisTemplateTest.opsForValue();
-        valueOperations.set("employee:1:OPERADOR", false);
-        valueOperations.set("employee:2:OPERADOR", false);
+        valueOperations.set("employee:1:OPERATOR", false);
+        valueOperations.set("employee:2:OPERATOR", false);
 
-        Employee result = adapter.execute(OPERADOR);
+        Employee result = adapter.execute(OPERATOR);
 
         assertNull(result);
     }

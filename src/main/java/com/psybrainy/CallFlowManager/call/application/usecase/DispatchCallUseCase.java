@@ -6,9 +6,7 @@ import com.psybrainy.CallFlowManager.call.domain.Call;
 import com.psybrainy.CallFlowManager.call.domain.Employee;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-
 import java.util.concurrent.CompletableFuture;
-
 import static com.psybrainy.CallFlowManager.call.domain.EmployeeType.*;
 
 @Component
@@ -32,13 +30,12 @@ public class DispatchCallUseCase {
             } else {
                 return "No employee available to handle the call";
             }
-
         });
     }
 
     private Employee getAvailableEmployee() {
 
-        Employee employee = getAvailableEmployeeByType.execute(OPERADOR);
+        Employee employee = getAvailableEmployeeByType.execute(OPERATOR);
         if (employee != null) {
             return employee;
         }

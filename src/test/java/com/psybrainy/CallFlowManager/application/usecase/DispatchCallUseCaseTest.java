@@ -18,6 +18,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -46,11 +47,16 @@ public class DispatchCallUseCaseTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
+        Set<String> keys = redisTemplate.keys("employee:*");
+        if (keys != null) {
+            keys.forEach(redisTemplate::delete);
+        }
+
         ValueOperations<String, Boolean> valueOperations = redisTemplate.opsForValue();
-        valueOperations.set("employee:1:OPERADOR", true);
-        valueOperations.set("employee:2:OPERADOR", true);
-        valueOperations.set("employee:3:OPERADOR", true);
-        valueOperations.set("employee:4:OPERADOR", true);
+        valueOperations.set("employee:1:OPERATOR", true);
+        valueOperations.set("employee:2:OPERATOR", true);
+        valueOperations.set("employee:3:OPERATOR", true);
+        valueOperations.set("employee:4:OPERATOR", true);
         valueOperations.set("employee:5:SUPERVISOR", true);
         valueOperations.set("employee:6:SUPERVISOR", true);
         valueOperations.set("employee:7:SUPERVISOR", true);
