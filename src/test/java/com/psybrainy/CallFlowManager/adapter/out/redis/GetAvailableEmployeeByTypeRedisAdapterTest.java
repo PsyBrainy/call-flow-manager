@@ -55,6 +55,6 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
 
         String result = adapter.execute(EmployeeType.OPERADOR);
 
-        assertEquals(null, result);
+        assertNull(result);
     }
 }
