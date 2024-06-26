@@ -21,7 +21,13 @@ public class HandleCallThreadAdapter implements HandleCall {
     public void execute(Call call, Employee employee) {
         try {
             Thread.sleep(call.getDuration() * 1000L);
-            redisTemplate.opsForValue().set(employee.getId(), true);
+
+            String redisEmployeeId = "employee:"
+                    .concat(employee.getId())
+                    .concat(":")
+                    .concat(employee.getType().name());
+
+            redisTemplate.opsForValue().set(redisEmployeeId, true);
             System.out.println("Call completed in " + call.getDuration() + " seconds by " + employee.getClass().getSimpleName());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

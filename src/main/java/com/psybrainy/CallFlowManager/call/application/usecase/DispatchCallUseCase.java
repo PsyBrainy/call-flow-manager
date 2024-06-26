@@ -1,9 +1,11 @@
 package com.psybrainy.CallFlowManager.call.application.usecase;
 
+import com.psybrainy.CallFlowManager.call.application.port.in.Dispatcher;
 import com.psybrainy.CallFlowManager.call.application.port.out.GetAvailableEmployeeByType;
 import com.psybrainy.CallFlowManager.call.application.port.out.HandleCall;
 import com.psybrainy.CallFlowManager.call.domain.Call;
 import com.psybrainy.CallFlowManager.call.domain.Employee;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -15,12 +17,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 import static com.psybrainy.CallFlowManager.call.domain.EmployeeType.*;
 
 @Component
-public class DispatchCallUseCase {
+public class DispatchCallUseCase implements Dispatcher<CompletableFuture<String>> {
 
     private final GetAvailableEmployeeByType getAvailableEmployeeByType;
     private final HandleCall handleCall;
     private final BlockingQueue<Call> callQueue = new LinkedBlockingQueue<>();
 
+    @Autowired
     public DispatchCallUseCase(GetAvailableEmployeeByType getAvailableEmployeeByType, HandleCall handleCall) {
         this.getAvailableEmployeeByType = getAvailableEmployeeByType;
         this.handleCall = handleCall;
@@ -28,6 +31,7 @@ public class DispatchCallUseCase {
     }
 
     @Async
+    @Override
     public CompletableFuture<String> dispatchCall(Call call) {
         return CompletableFuture.supplyAsync(() -> {
             Employee employee = getAvailableEmployee();

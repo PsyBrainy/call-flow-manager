@@ -1,6 +1,7 @@
 package com.psybrainy.CallFlowManager.application.usecase;
 
 import com.psybrainy.CallFlowManager.call.adapter.out.redis.GetAvailableEmployeeByTypeRedisAdapter;
+import com.psybrainy.CallFlowManager.call.application.port.in.Dispatcher;
 import com.psybrainy.CallFlowManager.call.application.port.out.GetAvailableEmployeeByType;
 import com.psybrainy.CallFlowManager.call.application.port.out.HandleCall;
 import com.psybrainy.CallFlowManager.call.application.usecase.DispatchCallUseCase;
@@ -9,7 +10,6 @@ import com.psybrainy.CallFlowManager.config.RedisTestConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +36,7 @@ public class DispatchCallUseCaseTest {
     @Mock
     private HandleCall handleCall;
 
-    @InjectMocks
-    private DispatchCallUseCase dispatchCallUseCase;
+    private Dispatcher<CompletableFuture<String>> dispatcher;
 
     @Autowired
     private RedisTemplate<String, Boolean> redisTemplate;
@@ -61,7 +60,7 @@ public class DispatchCallUseCaseTest {
         valueOperations.set("employee:10:DIRECTOR", true);
 
         getAvailableEmployeeByType = new GetAvailableEmployeeByTypeRedisAdapter(redisTemplate);
-        dispatchCallUseCase = new DispatchCallUseCase(getAvailableEmployeeByType, handleCall);
+        dispatcher = new DispatchCallUseCase(getAvailableEmployeeByType, handleCall);
 
         doNothing().when(handleCall).execute(any(Call.class), any());
     }
@@ -85,7 +84,7 @@ public class DispatchCallUseCaseTest {
             Call mockCall = new Call();
             CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
                 try {
-                    return dispatchCallUseCase.dispatchCall(mockCall).get();
+                    return dispatcher.dispatchCall(mockCall).get();
                 } catch (InterruptedException | ExecutionException e) {
                     throw new RuntimeException(e);
                 }
@@ -114,7 +113,7 @@ public class DispatchCallUseCaseTest {
         }
 
         Call mockCall = new Call();
-        CompletableFuture<String> future = dispatchCallUseCase.dispatchCall(mockCall);
+        CompletableFuture<String> future = dispatcher.dispatchCall(mockCall);
 
         assertEquals("No employee available, call added to the queue", future.get());
 
