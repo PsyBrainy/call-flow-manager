@@ -2,7 +2,9 @@ package com.psybrainy.CallFlowManager.adapter.out.redis;
 
 import com.psybrainy.CallFlowManager.call.adapter.out.redis.GetAvailableEmployeeByTypeRedisAdapter;
 import com.psybrainy.CallFlowManager.call.application.port.out.GetAvailableEmployeeByType;
+import com.psybrainy.CallFlowManager.call.domain.Employee;
 import com.psybrainy.CallFlowManager.call.domain.EmployeeType;
+import com.psybrainy.CallFlowManager.call.domain.Operator;
 import com.psybrainy.CallFlowManager.config.RedisTestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,10 +41,10 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
 
     @Test
     void testExecute() {
-        String result = adapter.execute(EmployeeType.OPERADOR);
+        Employee result = adapter.execute();
 
         assertNotNull(result);
-        assertEquals("employee:1:OPERADOR", result);
+        assertInstanceOf(Operator.class, result);
         ValueOperations<String, Boolean> valueOperations = redisTemplateTest.opsForValue();
         assertEquals(Boolean.FALSE, valueOperations.get("employee:1:OPERADOR"));
     }
@@ -53,7 +55,7 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
         valueOperations.set("employee:1:OPERADOR", false);
         valueOperations.set("employee:2:OPERADOR", false);
 
-        String result = adapter.execute(EmployeeType.OPERADOR);
+        Employee result = adapter.execute();
 
         assertNull(result);
     }

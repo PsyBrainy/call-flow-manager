@@ -1,9 +1,8 @@
 package com.psybrainy.CallFlowManager.call.adapter.out.redis;
 
 import com.psybrainy.CallFlowManager.call.application.port.out.GetAvailableEmployeeByType;
-import com.psybrainy.CallFlowManager.call.domain.EmployeeType;
+import com.psybrainy.CallFlowManager.call.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -23,19 +22,24 @@ public class GetAvailableEmployeeByTypeRedisAdapter implements GetAvailableEmplo
     }
 
     @Override
-    public String execute(EmployeeType type) {
+    public Employee execute() {
         lock.lock();
         try {
-            Set<String> keys = redisTemplate.keys("employee:*:" + type.name());
-            if (keys != null) {
-                for (String employee : keys) {
-                    Boolean isAvailable = redisTemplate.opsForValue().get(employee);
-                    if (Boolean.TRUE.equals(isAvailable)) {
-                        redisTemplate.opsForValue().set(employee, false);
-                        return employee;
-                    }
-                }
+            Employee availableEmployee = getAvailableEmployee(EmployeeType.OPERADOR);
+            if (availableEmployee != null) {
+                return availableEmployee;
             }
+
+            availableEmployee = getAvailableEmployee(EmployeeType.SUPERVISOR);
+            if (availableEmployee != null) {
+                return availableEmployee;
+            }
+
+            availableEmployee = getAvailableEmployee(EmployeeType.DIRECTOR);
+            if (availableEmployee != null) {
+                return availableEmployee;
+            }
+
             return null;
         } catch (Exception e) {
             //TODO
@@ -44,5 +48,29 @@ public class GetAvailableEmployeeByTypeRedisAdapter implements GetAvailableEmplo
         }finally {
             lock.unlock();
         }
+    }
+
+    private Employee getAvailableEmployee(EmployeeType type) {
+        Set<String> keys = redisTemplate.keys("employee:*:" + type.name());
+        if (keys != null) {
+            for (String employee : keys) {
+                Boolean isAvailable = redisTemplate.opsForValue().get(employee);
+                if (Boolean.TRUE.equals(isAvailable)) {
+                    redisTemplate.opsForValue().set(employee, false);
+
+                    String idEmployee = employee
+                            .replace("employee:", "")
+                            .replace(":" + type.name(), "");
+
+                    return switch (type) {
+                        case OPERADOR -> new Operator(idEmployee);
+                        case SUPERVISOR -> new Supervisor(idEmployee);
+                        case DIRECTOR -> new Director(idEmployee);
+                        default -> null;
+                    };
+                }
+            }
+        }
+        return null;
     }
 }
