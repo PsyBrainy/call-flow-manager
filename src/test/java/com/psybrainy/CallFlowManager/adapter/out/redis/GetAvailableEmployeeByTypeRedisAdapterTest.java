@@ -3,7 +3,6 @@ package com.psybrainy.CallFlowManager.adapter.out.redis;
 import com.psybrainy.CallFlowManager.call.adapter.out.redis.GetAvailableEmployeeByTypeRedisAdapter;
 import com.psybrainy.CallFlowManager.call.application.port.out.GetAvailableEmployeeByType;
 import com.psybrainy.CallFlowManager.call.domain.Employee;
-import com.psybrainy.CallFlowManager.call.domain.EmployeeType;
 import com.psybrainy.CallFlowManager.call.domain.Operator;
 import com.psybrainy.CallFlowManager.config.RedisTestConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +14,7 @@ import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.Set;
 
+import static com.psybrainy.CallFlowManager.call.domain.EmployeeType.OPERADOR;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = {RedisTestConfig.class})
@@ -41,7 +41,7 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
 
     @Test
     void testExecute() {
-        Employee result = adapter.execute();
+        Employee result = adapter.execute(OPERADOR);
 
         assertNotNull(result);
         assertInstanceOf(Operator.class, result);
@@ -55,7 +55,7 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
         valueOperations.set("employee:1:OPERADOR", false);
         valueOperations.set("employee:2:OPERADOR", false);
 
-        Employee result = adapter.execute();
+        Employee result = adapter.execute(OPERADOR);
 
         assertNull(result);
     }

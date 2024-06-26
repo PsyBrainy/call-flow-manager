@@ -17,29 +17,34 @@ public class GetAvailableEmployeeByTypeRedisAdapter implements GetAvailableEmplo
     private final Lock lock = new ReentrantLock();
 
     @Autowired
-    public GetAvailableEmployeeByTypeRedisAdapter(  RedisTemplate<String, Boolean> redisTemplate) {
+    public GetAvailableEmployeeByTypeRedisAdapter(RedisTemplate<String, Boolean> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
     @Override
-    public Employee execute() {
+    public Employee execute(EmployeeType type) {
         lock.lock();
         try {
-            Employee availableEmployee = getAvailableEmployee(EmployeeType.OPERADOR);
-            if (availableEmployee != null) {
-                return availableEmployee;
-            }
+            Set<String> keys = redisTemplate.keys("employee:*:" + type.name());
+            if (keys != null) {
+                for (String employee : keys) {
+                    Boolean isAvailable = redisTemplate.opsForValue().get(employee);
+                    if (Boolean.TRUE.equals(isAvailable)) {
+                        redisTemplate.opsForValue().set(employee, false);
 
-            availableEmployee = getAvailableEmployee(EmployeeType.SUPERVISOR);
-            if (availableEmployee != null) {
-                return availableEmployee;
-            }
+                        String idEmployee = employee
+                                .replace("employee:", "")
+                                .replace(":" + type.name(), "");
 
-            availableEmployee = getAvailableEmployee(EmployeeType.DIRECTOR);
-            if (availableEmployee != null) {
-                return availableEmployee;
+                        return switch (type) {
+                            case OPERADOR -> new Operator(idEmployee);
+                            case SUPERVISOR -> new Supervisor(idEmployee);
+                            case DIRECTOR -> new Director(idEmployee);
+                            default -> null;
+                        };
+                    }
+                }
             }
-
             return null;
         } catch (Exception e) {
             //TODO
@@ -48,29 +53,5 @@ public class GetAvailableEmployeeByTypeRedisAdapter implements GetAvailableEmplo
         }finally {
             lock.unlock();
         }
-    }
-
-    private Employee getAvailableEmployee(EmployeeType type) {
-        Set<String> keys = redisTemplate.keys("employee:*:" + type.name());
-        if (keys != null) {
-            for (String employee : keys) {
-                Boolean isAvailable = redisTemplate.opsForValue().get(employee);
-                if (Boolean.TRUE.equals(isAvailable)) {
-                    redisTemplate.opsForValue().set(employee, false);
-
-                    String idEmployee = employee
-                            .replace("employee:", "")
-                            .replace(":" + type.name(), "");
-
-                    return switch (type) {
-                        case OPERADOR -> new Operator(idEmployee);
-                        case SUPERVISOR -> new Supervisor(idEmployee);
-                        case DIRECTOR -> new Director(idEmployee);
-                        default -> null;
-                    };
-                }
-            }
-        }
-        return null;
     }
 }
