@@ -62,7 +62,7 @@ public class DispatchCallUseCase {
     }
 
     @Async
-    public void startQueueProcessor() {
+    protected void startQueueProcessor() {
         Executors.newSingleThreadExecutor().execute(() -> {
             while (true) {
                 try {
