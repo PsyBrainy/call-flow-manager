@@ -25,7 +25,7 @@ Call Flow Manager es un sistema diseñado para gestionar los flujos de llamadas 
 git clone https://github.com/PsyBrainy/call-flow-manager.git
 ```
 
-2. Ejecutar docker_compose
+2. Ejecutar docker-compose
 
 ```bash
 sudo docker-compose up --build
@@ -76,7 +76,7 @@ mvn -Dtest=GetAvailableEmployeeByTypeRedisAdapterTest#whenNoAvailableOperators_t
 mvn -Dtest=HandleCallThreadAdapterTest test
 ```
 
-#### "Al ejecutar una llamada con un operador, el estado del operador se establece como disponible después de procesarla
+#### Al ejecutar una llamada con un operador, el estado del operador se establece como disponible después de procesarla
 ```bash
 mvn -Dtest=HandleCallThreadAdapterTest#whenExecutingCallWithOperator_thenOperatorStatusIsSetToAvailableAfterProcessing test
 ```
