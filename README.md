@@ -39,6 +39,44 @@ mvn clean test
 
 ### Pruebas
 
+#### Dispatcher Test General
+```bash
+mvn -Dtest=DispatchCallUseCaseTest test
+```
+
+#### Al despachar llamadas de manera concurrente, cada llamada se despacha con éxito
+```bash
+mvn -Dtest=DispatchCallUseCaseTest#whenDispatchingCallsConcurrently_thenEachCallIsDispatchedSuccessfully test
+```
+#### Cuando no hay empleados disponibles, la llamada se pone en cola y se procesa cuando un empleado cambia de estado
+```bash
+mvn -Dtest=DispatchCallUseCaseTest#whenNoEmployeesAreAvailable_thenCallIsQueuedAndProcessedWhenAnEmployeeBecomesAvailable test
+```
+
+#### Obtener Empleado Disponible Test General
+```bash
+mvn -Dtest=GetAvailableEmployeeByTypeRedisAdapterTest test
+```
+
+#### Al asignar una llamada, se elige al primer empleado disponible con prioridad para los operadores
+```bash
+mvn -Dtest=GetAvailableEmployeeByTypeRedisAdapterTest#whenAssigningCall_thenFirstAvailableEmployeeWithPriorityToOperatorsIsChosen test
+```
+#### Cuando no hay operadores disponibles, el resultado es nulo
+```bash
+mvn -Dtest=GetAvailableEmployeeByTypeRedisAdapterTest#whenNoAvailableOperators_thenResultIsNull test
+```
+
+#### Capturar Llamadas Test General
+```bash
+mvn -Dtest=HandleCallThreadAdapterTest test
+```
+
+#### "Al ejecutar una llamada con un operador, el estado del operador se establece como disponible después de procesarla
+```bash
+mvn -Dtest=HandleCallThreadAdapterTest#whenExecutingCallWithOperator_thenOperatorStatusIsSetToAvailableAfterProcessing test
+```
+
 ### Diagrama
 
 ![](https://github.com/PsyBrainy/call-flow-manager/blob/develop/image/call_manager.drawio.png)
