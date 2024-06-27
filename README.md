@@ -8,6 +8,7 @@
   - [Descripción General](#descripción-general)
   - [Configuración](#configuración)
   - [Pruebas](#pruebas)
+  - [Diagrama](#diagrama)
 
 ## Introducción
 Call Flow Manager es un sistema diseñado para gestionar los flujos de llamadas dentro de un Callcenter, asegurando una asignación eficiente de las llamadas a los empleados disponibles según sus roles.
@@ -38,11 +39,7 @@ mvn clean test
 
 ### Pruebas
 
-### Sequence Diagram
+### Diagrama
 
-```seq
-Andrew->China: Says Hello 
-Note right of China: China thinks\nabout it 
-China-->Andrew: How are you? 
-Andrew->>China: I am good thanks!
-```
+![](https://github.com/PsyBrainy/call-flow-manager/blob/develop/image/call_manager.drawio.png)
+
