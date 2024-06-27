@@ -9,6 +9,7 @@ import com.psybrainy.CallFlowManager.call.domain.Call;
 import com.psybrainy.CallFlowManager.config.RedisTestConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @Import(RedisTestConfig.class)
+@DisplayName("Dispatcher test")
 public class DispatchCallUseCaseTest {
 
     @Mock
@@ -74,7 +76,8 @@ public class DispatchCallUseCaseTest {
     }
 
     @Test
-    void testDispatchCall() throws ExecutionException, InterruptedException {
+    @DisplayName("When dispatching calls concurrently, then each call is dispatched successfully")
+    void whenDispatchingCallsConcurrently_thenEachCallIsDispatchedSuccessfully() throws ExecutionException, InterruptedException {
 
         ExecutorService executorService = Executors.newFixedThreadPool(10);
 
@@ -102,7 +105,8 @@ public class DispatchCallUseCaseTest {
     }
 
     @Test
-    void testCallQueueingAndProcessing() throws ExecutionException, InterruptedException {
+    @DisplayName("When no employees are available, then call is queued and processed when an employee becomes available")
+    void whenNoEmployeesAreAvailable_thenCallIsQueuedAndProcessedWhenAnEmployeeBecomesAvailable() throws ExecutionException, InterruptedException {
 
         ValueOperations<String, Boolean> valueOperations = redisTemplate.opsForValue();
         Set<String> keys = redisTemplate.keys("employee:*");

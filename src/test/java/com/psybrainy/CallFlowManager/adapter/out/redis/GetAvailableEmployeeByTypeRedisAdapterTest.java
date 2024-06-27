@@ -7,6 +7,7 @@ import com.psybrainy.CallFlowManager.call.domain.Operator;
 import com.psybrainy.CallFlowManager.config.RedisTestConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Import(RedisTestConfig.class)
+@DisplayName("Get Available Employee By Type test")
 public class GetAvailableEmployeeByTypeRedisAdapterTest {
 
     @Autowired
@@ -35,6 +37,8 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
         ValueOperations<String, Boolean> valueOperations = redisTemplateTest.opsForValue();
         valueOperations.set("employee:1:OPERATOR", true);
         valueOperations.set("employee:2:OPERATOR", false);
+        valueOperations.set("employee:3:SUPERVISOR", true);
+        valueOperations.set("employee:4:SUPERVISOR", true);
     }
 
     @AfterEach
@@ -46,7 +50,8 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
     }
 
     @Test
-    void testExecute() {
+    @DisplayName("When assigning call, then first available employee with priority to operators is chosen")
+    void whenAssigningCall_thenFirstAvailableEmployeeWithPriorityToOperatorsIsChosen() {
         Employee result = adapter.execute(OPERATOR);
 
         assertNotNull(result);
@@ -56,7 +61,8 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
     }
 
     @Test
-    void testNoAvailableEmployee() {
+    @DisplayName("When no operators are available, then result is null")
+    void whenNoAvailableOperators_thenResultIsNull() {
         ValueOperations<String, Boolean> valueOperations = redisTemplateTest.opsForValue();
         valueOperations.set("employee:1:OPERATOR", false);
         valueOperations.set("employee:2:OPERATOR", false);

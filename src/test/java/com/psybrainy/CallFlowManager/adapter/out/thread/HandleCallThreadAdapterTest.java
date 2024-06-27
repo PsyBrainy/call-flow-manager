@@ -7,6 +7,7 @@ import com.psybrainy.CallFlowManager.call.domain.Operator;
 import com.psybrainy.CallFlowManager.config.RedisTestConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Import(RedisTestConfig.class)
+@DisplayName("Handle Call test")
 public class HandleCallThreadAdapterTest {
 
     @Autowired
@@ -44,7 +46,8 @@ public class HandleCallThreadAdapterTest {
     }
 
     @Test
-    void testExecute() throws InterruptedException {
+    @DisplayName("When executing a call with an operator, then operator status is set to available after processing")
+    void whenExecutingCallWithOperator_thenOperatorStatusIsSetToAvailableAfterProcessing() throws InterruptedException {
         Call call = new Call();
         adapter.execute(call, new Operator("1"));
 
