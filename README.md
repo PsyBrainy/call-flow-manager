@@ -30,7 +30,7 @@ git clone https://github.com/PsyBrainy/call-flow-manager.git
 ```bash
 sudo docker-compose up --build
 ```
-
+(docker-compose levanta un servidor redis y el aplicativo)
 
 ## Dispatcher
 ### Descripción General
@@ -40,6 +40,8 @@ sudo docker-compose up --build
 ### Configuración
 
 ### Pruebas
+
+Los test levantan su propio servidor redis embebido para pruebas
 
 #### Dispatcher Test General
 ```bash
