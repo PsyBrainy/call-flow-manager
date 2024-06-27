@@ -14,4 +14,11 @@ public class Call {
     public int getDuration() {
         return duration;
     }
+
+    @Override
+    public String toString() {
+        return "Call{" +
+                "duration=" + duration +
+                '}';
+    }
 }

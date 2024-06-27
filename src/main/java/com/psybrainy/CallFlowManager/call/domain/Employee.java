@@ -25,4 +25,12 @@ public abstract class Employee {
     public void setType(EmployeeType type) {
         this.type = type;
     }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "id='" + id + '\'' +
+                ", type=" + type +
+                '}';
+    }
 }
