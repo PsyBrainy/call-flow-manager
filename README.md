@@ -25,11 +25,13 @@ Call Flow Manager es un sistema diseñado para gestionar los flujos de llamadas 
 git clone https://github.com/PsyBrainy/call-flow-manager.git
 ```
 
-2. Ejecutar tests
+2. Ejecutar docker_compose
 
 ```bash
-mvn clean test
+sudo docker-compose up --build
 ```
+
+
 ## Dispatcher
 ### Descripción General
 
