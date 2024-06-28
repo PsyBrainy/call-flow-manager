@@ -1,6 +1,7 @@
 package com.psybrainy.CallFlowManager.call.application.usecase;
 
 import com.psybrainy.CallFlowManager.call.application.port.in.Dispatcher;
+import com.psybrainy.CallFlowManager.call.application.port.out.AddCallToQueue;
 import com.psybrainy.CallFlowManager.call.application.port.out.GetAvailableEmployeeByType;
 import com.psybrainy.CallFlowManager.call.application.port.out.HandleCall;
 import com.psybrainy.CallFlowManager.call.domain.Call;
@@ -9,41 +10,44 @@ import com.psybrainy.CallFlowManager.share.AbstractLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import static com.psybrainy.CallFlowManager.call.domain.EmployeeType.*;
 
 @Component
 public class DispatchCallUseCase
         extends AbstractLogger
-        implements Dispatcher<CompletableFuture<String>> {
+        implements Dispatcher {
 
     private final GetAvailableEmployeeByType getAvailableEmployeeByType;
     private final HandleCall handleCall;
-    private final BlockingQueue<Call> callQueue = new LinkedBlockingQueue<>();
+    private final AddCallToQueue addCallToQueue;
 
     @Autowired
-    public DispatchCallUseCase(GetAvailableEmployeeByType getAvailableEmployeeByType, HandleCall handleCall) {
+    public DispatchCallUseCase(GetAvailableEmployeeByType getAvailableEmployeeByType, HandleCall handleCall, AddCallToQueue addCallToQueue) {
         this.getAvailableEmployeeByType = getAvailableEmployeeByType;
         this.handleCall = handleCall;
-        startQueueProcessor();
+        this.addCallToQueue = addCallToQueue;
     }
 
     @Async
     @Override
     public CompletableFuture<String> dispatchCall(Call call) {
-        log.info("Call received: {}", call);
         return CompletableFuture.supplyAsync(() -> {
-            Employee employee = getAvailableEmployee();
-            if (employee != null) {
-                handleCall.execute(call, employee);
-                return "Call dispatched successfully";
-            } else {
-                callQueue.offer(call);
-                return "No employee available, call added to the queue";
+            try {
+                Employee employee = getAvailableEmployee();
+                if (employee != null) {
+                    log.info("Employee found: {}", employee);
+                    handleCall.execute(call, employee);
+                    return "Call dispatched successfully";
+                } else {
+                    log.info("No employee available, adding call to queue");
+                    addCallToQueue.send(call);
+                    return "No employee available, call added to the queue";
+                }
+            } catch (Exception e) {
+                log.error("Error dispatching call", e);
+                return "Error dispatching call";
             }
         });
     }
@@ -72,25 +76,5 @@ public class DispatchCallUseCase
         }
         log.info("No available employee");
         return null;
-    }
-
-    @Async
-    protected void startQueueProcessor() {
-        Executors.newSingleThreadExecutor().execute(() -> {
-            while (true) {
-                try {
-                    Call call = callQueue.take();
-                    Employee employee;
-                    while ((employee = getAvailableEmployee()) == null) {
-                        log.info("Retry call queue: {}", call);
-                        Thread.sleep(1000);
-                    }
-                    log.info("Call queue received: {}", call);
-                    handleCall.execute(call, employee);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        });
     }
 }
