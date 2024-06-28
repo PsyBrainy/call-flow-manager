@@ -39,6 +39,52 @@ sudo docker-compose up --build
 
 ### Configuración
 
+Este proyecto utiliza varias propiedades configurables que pueden ser ajustadas mediante variables de entorno o directamente en los archivos de propiedades. A continuación, se describen las propiedades más importantes:
+
+### Propiedades de Redis
+
+Estas propiedades configuran la conexión a la base de datos Redis.
+
+- `spring.data.redis.host`: Especifica la dirección del host de Redis. Puede ser configurado mediante la variable de entorno `SPRING_REDIS_HOST`. Si no se especifica, se utiliza `localhost` por defecto.
+
+```properties
+spring.data.redis.host=${SPRING_REDIS_HOST:localhost}
+```
+
+- `spring.data.redis.port`: Especifica el puerto en el cual Redis está escuchando. El valor predeterminado es `6379`.
+
+```properties
+spring.data.redis.port=6379
+```
+
+### Propiedades de Ejecución Asíncrona
+
+Estas propiedades configuran el comportamiento del executor asíncrono utilizado en el proyecto.
+
+- `spring.async.core-size`: Especifica el tamaño del pool de hilos centrales. Puede ser configurado mediante la variable de entorno `CORE_SIZE`. El valor predeterminado es `10`.
+
+```properties
+spring.async.core-size=${CORE_SIZE:10}
+```
+
+- `spring.async.max-size`: Especifica el tamaño máximo del pool de hilos. Puede ser configurado mediante la variable de entorno `MAX_SIZE`. El valor predeterminado es `15`.
+
+```properties
+spring.async.max-size=${MAX_SIZE:15}
+```
+
+- `spring.async.capacity`: Especifica la capacidad de la cola de tareas. Puede ser configurado mediante la variable de entorno `CAPACITY`. El valor predeterminado es `100`.
+
+```properties
+spring.async.capacity=${CAPACITY:100}
+```
+
+- `spring.async.name-prefix`: Especifica el prefijo para los nombres de los hilos. Puede ser configurado mediante la variable de entorno `NAME_PREFIX`. El valor predeterminado es `Async-`.
+
+```properties
+spring.async.name-prefix=${NAME_PREFIX:Async-}
+```
+
 ### Pruebas
 
 Los test levantan su propio servidor redis embebido para pruebas

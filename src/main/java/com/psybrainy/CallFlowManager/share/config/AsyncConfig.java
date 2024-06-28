@@ -1,5 +1,7 @@
 package com.psybrainy.CallFlowManager.share.config;
 
+import com.psybrainy.CallFlowManager.share.properties.ThreadProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -11,13 +13,20 @@ import java.util.concurrent.Executor;
 @EnableAsync
 public class AsyncConfig {
 
+    private final ThreadProperties threadProperties;
+
+    @Autowired
+    public AsyncConfig(ThreadProperties threadProperties) {
+        this.threadProperties = threadProperties;
+    }
+
     @Bean
     public Executor asyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(15);
-        executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("Async-");
+        executor.setCorePoolSize(threadProperties.getCoreSize());
+        executor.setMaxPoolSize(threadProperties.getMaxSize());
+        executor.setQueueCapacity(threadProperties.getCapacity());
+        executor.setThreadNamePrefix(threadProperties.getNamePrefix());
         executor.initialize();
         return executor;
     }
