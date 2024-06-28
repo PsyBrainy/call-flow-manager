@@ -3,6 +3,7 @@ package com.psybrainy.CallFlowManager.call.adapter.in.kafka;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.psybrainy.CallFlowManager.call.application.port.in.Dispatcher;
 import com.psybrainy.CallFlowManager.call.domain.Call;
+import com.psybrainy.CallFlowManager.share.AbstractLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-public class DispatchCallKafkaAdapter {
+public class DispatchCallKafkaAdapter extends AbstractLogger {
 
     private final Dispatcher dispatcher;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -23,9 +24,9 @@ public class DispatchCallKafkaAdapter {
     @KafkaListener(topics = "call-topic", groupId = "call")
     public void listen(String message) {
         try {
-            System.out.println("Message received: " + message);
+            log.info("Message received: {}", message);
             Call call = objectMapper.readValue(message, Call.class);
-            System.out.println("Call received: " + call);
+            log.info("Call received: {}", call);
             dispatcher.dispatchCall(call);
         } catch (Exception e) {
             e.printStackTrace();
