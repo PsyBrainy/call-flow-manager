@@ -2,6 +2,8 @@ package com.psybrainy.CallFlowManager.call.application.port.in;
 
 import com.psybrainy.CallFlowManager.call.domain.Call;
 
-public interface Dispatcher<T> {
-    T dispatchCall(Call call);
+import java.util.concurrent.CompletableFuture;
+
+public interface Dispatcher {
+    CompletableFuture<String> dispatchCall(Call call);
 }

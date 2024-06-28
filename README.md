@@ -87,7 +87,8 @@ spring.async.name-prefix=${NAME_PREFIX:Async-}
 
 ### Pruebas
 
-Los test levantan su propio servidor redis embebido para pruebas
+Los test levantan su propio servidor REDIS embebido para pruebas
+Los test levantan su propio servidor KAFKA embebido para pruebas
 
 #### Dispatcher Test General
 ```bash
