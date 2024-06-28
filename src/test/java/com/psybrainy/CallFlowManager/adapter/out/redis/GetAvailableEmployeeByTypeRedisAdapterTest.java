@@ -5,15 +5,13 @@ import com.psybrainy.CallFlowManager.call.application.port.out.GetAvailableEmplo
 import com.psybrainy.CallFlowManager.call.domain.Employee;
 import com.psybrainy.CallFlowManager.call.domain.Operator;
 import com.psybrainy.CallFlowManager.config.RedisTestConfig;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 
 import java.util.Set;
 
@@ -22,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Import(RedisTestConfig.class)
+@EmbeddedKafka(partitions = 1, topics = "call-topic")
 @DisplayName("Get Available Employee By Type test")
 public class GetAvailableEmployeeByTypeRedisAdapterTest {
 

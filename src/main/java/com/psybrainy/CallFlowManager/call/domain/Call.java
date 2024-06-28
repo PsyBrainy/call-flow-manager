@@ -1,5 +1,8 @@
 package com.psybrainy.CallFlowManager.call.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.security.SecureRandom;
 
 public class Call {
@@ -9,6 +12,11 @@ public class Call {
 
     public Call() {
         this.duration = 5 + RANDOM.nextInt(6);
+    }
+
+    @JsonCreator
+    public Call(@JsonProperty("duration") int duration) {
+        this.duration = duration;
     }
 
     public int getDuration() {

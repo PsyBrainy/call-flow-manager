@@ -1,8 +1,9 @@
 package com.psybrainy.CallFlowManager.config;
 
+import com.psybrainy.CallFlowManager.share.properties.RedisProperties;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -18,16 +19,18 @@ import java.io.IOException;
 @EnableRedisRepositories
 public class RedisTestConfig {
 
-    @Value("${spring.data.redis.host}")
-    private String host;
-    @Value("${spring.data.redis.port}")
-    private int port;
+    private final RedisProperties redisProperties;
+
+    @Autowired
+    public RedisTestConfig(RedisProperties redisProperties) {
+        this.redisProperties = redisProperties;
+    }
 
     private RedisServer redisServer;
 
     @PostConstruct
     public void postConstruct() throws IOException {
-        redisServer = new RedisServer(port);
+        redisServer = new RedisServer(redisProperties.getPort());
         redisServer.start();
     }
 
@@ -39,8 +42,8 @@ public class RedisTestConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(host);
-        redisStandaloneConfiguration.setPort(port);
+        redisStandaloneConfiguration.setHostName(redisProperties.getHost());
+        redisStandaloneConfiguration.setPort(redisProperties.getPort());
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 
