@@ -129,6 +129,8 @@ mvn -Dtest=HandleCallThreadAdapterTest#whenExecutingCallWithOperator_thenOperato
 ```
 
 ### Diagrama
-
+Diagrama de Clases
 ![](https://github.com/PsyBrainy/call-flow-manager/blob/master/image/call_manager.drawio.png)
+Diagrama de Secuencia
+![](https://github.com/PsyBrainy/call-flow-manager/blob/master/image/call_manager-Page-2.drawio.png)
 
