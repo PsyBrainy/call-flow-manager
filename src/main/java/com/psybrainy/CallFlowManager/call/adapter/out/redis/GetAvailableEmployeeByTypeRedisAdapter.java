@@ -6,6 +6,8 @@ import com.psybrainy.CallFlowManager.share.AbstractLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -24,7 +26,7 @@ public class GetAvailableEmployeeByTypeRedisAdapter
     }
 
     @Override
-    public Employee execute(EmployeeType type) {
+    public Optional<Employee> execute(EmployeeType type) {
         lock.lock();
         try {
             Set<String> keys = redisTemplate.keys("employee:*:" + type.name());
@@ -40,20 +42,20 @@ public class GetAvailableEmployeeByTypeRedisAdapter
                                 .replace(":" + type.name(), "");
                         log.info("Employee {} available with type: {}", idEmployee, type.name());
                         return switch (type) {
-                            case OPERATOR -> new Operator(idEmployee);
-                            case SUPERVISOR -> new Supervisor(idEmployee);
-                            case DIRECTOR -> new Director(idEmployee);
-                            default -> null;
+                            case OPERATOR -> Optional.of(new Operator(idEmployee));
+                            case SUPERVISOR -> Optional.of(new Supervisor(idEmployee));
+                            case DIRECTOR -> Optional.of(new Director(idEmployee));
+                            default -> Optional.empty();
                         };
                     }
                 }
             }
             log.info("Employee {} not available", type.name());
-            return null;
+            return Optional.empty();
         } catch (Exception e) {
             //TODO
             e.printStackTrace();
-            return null;
+            return Optional.empty();
         }finally {
             lock.unlock();
         }

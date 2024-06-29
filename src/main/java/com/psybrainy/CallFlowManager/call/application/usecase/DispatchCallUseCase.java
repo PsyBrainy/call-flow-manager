@@ -10,6 +10,8 @@ import com.psybrainy.CallFlowManager.share.AbstractLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static com.psybrainy.CallFlowManager.call.domain.EmployeeType.*;
@@ -35,10 +37,10 @@ public class DispatchCallUseCase
     public CompletableFuture<String> dispatchCall(Call call) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Employee employee = getAvailableEmployee();
-                if (employee != null) {
+                Optional<Employee> employee = getAvailableEmployee();
+                if (employee.isPresent()) {
                     log.info("Employee found: {}", employee);
-                    handleCall.execute(call, employee);
+                    handleCall.execute(call, employee.get());
                     return "Call dispatched successfully";
                 } else {
                     log.info("No employee available, adding call to queue");
@@ -52,29 +54,29 @@ public class DispatchCallUseCase
         });
     }
 
-    private Employee getAvailableEmployee() {
+    private Optional<Employee> getAvailableEmployee() {
 
         log.info("Search available employee by type: {}", OPERATOR.name());
-        Employee employee = getAvailableEmployeeByType.execute(OPERATOR);
-        if (employee != null) {
+        Optional<Employee> employee = getAvailableEmployeeByType.execute(OPERATOR);
+        if (employee.isPresent()) {
             log.info("Found available employee: {}", employee);
             return employee;
         }
 
         log.info("Search available employee by type: {}", SUPERVISOR.name());
         employee = getAvailableEmployeeByType.execute(SUPERVISOR);
-        if (employee != null) {
+        if (employee.isPresent()) {
             log.info("Found available employee: {}", employee);
             return employee;
         }
 
         log.info("Search available employee by type: {}", DIRECTOR.name());
         employee = getAvailableEmployeeByType.execute(DIRECTOR);
-        if (employee != null) {
+        if (employee.isPresent()) {
             log.info("Found available employee: {}", employee);
             return employee;
         }
         log.info("No available employee");
-        return null;
+        return Optional.empty();
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 
+import java.util.Optional;
 import java.util.Set;
 
 import static com.psybrainy.CallFlowManager.call.domain.EmployeeType.OPERATOR;
@@ -51,10 +52,10 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
     @Test
     @DisplayName("When assigning call, then first available employee with priority to operators is chosen")
     void whenAssigningCall_thenFirstAvailableEmployeeWithPriorityToOperatorsIsChosen() {
-        Employee result = adapter.execute(OPERATOR);
+        Optional<Employee> result = adapter.execute(OPERATOR);
 
-        assertNotNull(result);
-        assertInstanceOf(Operator.class, result);
+        assertTrue(result.isPresent());
+        assertInstanceOf(Operator.class, result.get());
         ValueOperations<String, Boolean> valueOperations = redisTemplateTest.opsForValue();
         assertEquals(Boolean.FALSE, valueOperations.get("employee:1:OPERATOR"));
     }
@@ -66,8 +67,8 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
         valueOperations.set("employee:1:OPERATOR", false);
         valueOperations.set("employee:2:OPERATOR", false);
 
-        Employee result = adapter.execute(OPERATOR);
+        Optional<Employee> result = adapter.execute(OPERATOR);
 
-        assertNull(result);
+        assertTrue(result.isEmpty());
     }
 }
