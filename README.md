@@ -30,7 +30,7 @@ git clone https://github.com/PsyBrainy/call-flow-manager.git
 ```bash
 sudo docker-compose up --build
 ```
-(docker-compose levanta un servidor redis y el aplicativo)
+(docker-compose levanta un servidor redis, un servidor kafka y el aplicativo)
 
 ## Dispatcher
 ### Descripción General
@@ -129,6 +129,8 @@ mvn -Dtest=HandleCallThreadAdapterTest#whenExecutingCallWithOperator_thenOperato
 ```
 
 ### Diagrama
-
-![](https://github.com/PsyBrainy/call-flow-manager/blob/develop/image/call_manager.drawio.png)
+#### Diagrama de Clases
+![](https://github.com/PsyBrainy/call-flow-manager/blob/master/image/call_manager.drawio.png)
+#### Diagrama de Secuencia
+![](https://github.com/PsyBrainy/call-flow-manager/blob/master/image/call_manager-Page-2.drawio.png)
 
