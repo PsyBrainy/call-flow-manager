@@ -113,9 +113,20 @@ mvn -Dtest=GetAvailableEmployeeByTypeRedisAdapterTest test
 ```bash
 mvn -Dtest=GetAvailableEmployeeByTypeRedisAdapterTest#whenAssigningCall_thenFirstAvailableEmployeeWithPriorityToOperatorsIsChosen test
 ```
-#### Cuando no hay operadores disponibles, el resultado es nulo
+
+#### Cuando no hay operadores disponibles, el resultado es vacio
 ```bash
-mvn -Dtest=GetAvailableEmployeeByTypeRedisAdapterTest#whenNoAvailableOperators_thenResultIsNull test
+mvn -Dtest=GetAvailableEmployeeByTypeRedisAdapterTest#whenNoAvailableOperators_thenResultIsEmpty test
+```
+
+#### Cuando ocurre un error de conexión a Redis, se lanza EmployeeServiceException
+```bash
+mvn -Dtest=GetAvailableEmployeeByTypeRedisAdapterTest#whenRedisConnectionErrorOccurs_thenEmployeeServiceExceptionIsThrown test
+```
+
+#### Cuando ocurre un error inesperado, se lanza EmployeeServiceException
+```bash
+mvn -Dtest=GetAvailableEmployeeByTypeRedisAdapterTest#whenUnexpectedErrorOccurs_thenEmployeeServiceExceptionIsThrown test
 ```
 
 #### Capturar Llamadas Test General
@@ -126,6 +137,16 @@ mvn -Dtest=HandleCallThreadAdapterTest test
 #### Al ejecutar una llamada con un operador, el estado del operador se establece como disponible después de procesarla
 ```bash
 mvn -Dtest=HandleCallThreadAdapterTest#whenExecutingCallWithOperator_thenOperatorStatusIsSetToAvailableAfterProcessing test
+```
+
+#### Cuando ocurre una excepción de conexión a Redis, se lanza CallHandlingException
+```bash
+mvn -Dtest=HandleCallThreadAdapterTest#whenRedisOperationThrowsException_thenCallHandlingExceptionIsThrown test
+```
+
+#### Cuando el hilo es interrumpido, se lanza CallHandlingException
+```bash
+mvn -Dtest=HandleCallThreadAdapterTest#whenThreadIsInterrupted_thenCallHandlingExceptionIsThrown test
 ```
 
 ### Diagrama
