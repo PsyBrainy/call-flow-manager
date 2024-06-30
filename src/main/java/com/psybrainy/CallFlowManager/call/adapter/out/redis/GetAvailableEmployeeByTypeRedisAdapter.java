@@ -1,8 +1,10 @@
 package com.psybrainy.CallFlowManager.call.adapter.out.redis;
 
+import com.psybrainy.CallFlowManager.share.exception.EmployeeServiceException;
 import com.psybrainy.CallFlowManager.call.application.port.out.GetAvailableEmployeeByType;
 import com.psybrainy.CallFlowManager.call.domain.*;
 import com.psybrainy.CallFlowManager.share.AbstractLogger;
+import io.lettuce.core.RedisConnectionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -52,11 +54,13 @@ public class GetAvailableEmployeeByTypeRedisAdapter
             }
             log.info("Employee {} not available", type.name());
             return Optional.empty();
+        } catch (RedisConnectionException e) {
+            log.error("Redis connection error", e);
+            throw new EmployeeServiceException("Redis connection error", e);
         } catch (Exception e) {
-            //TODO
-            e.printStackTrace();
-            return Optional.empty();
-        }finally {
+            log.error("Unexpected error", e);
+            throw new EmployeeServiceException("Unexpected error", e);
+        } finally {
             lock.unlock();
         }
     }

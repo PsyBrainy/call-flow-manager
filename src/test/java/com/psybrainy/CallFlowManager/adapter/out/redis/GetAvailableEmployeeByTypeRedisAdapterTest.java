@@ -5,7 +5,10 @@ import com.psybrainy.CallFlowManager.call.application.port.out.GetAvailableEmplo
 import com.psybrainy.CallFlowManager.call.domain.Employee;
 import com.psybrainy.CallFlowManager.call.domain.Operator;
 import com.psybrainy.CallFlowManager.config.RedisTestConfig;
+import com.psybrainy.CallFlowManager.share.exception.EmployeeServiceException;
+import io.lettuce.core.RedisConnectionException;
 import org.junit.jupiter.api.*;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -18,6 +21,7 @@ import java.util.Set;
 
 import static com.psybrainy.CallFlowManager.call.domain.EmployeeType.OPERATOR;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Import(RedisTestConfig.class)
@@ -29,6 +33,9 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
     private RedisTemplate<String, Boolean> redisTemplateTest;
 
     private GetAvailableEmployeeByType adapter;
+
+    @Mock
+    private RedisTemplate<String, Boolean> redisTemplateMock;
 
     @BeforeEach
     void setUp() {
@@ -61,8 +68,8 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
     }
 
     @Test
-    @DisplayName("When no operators are available, then result is null")
-    void whenNoAvailableOperators_thenResultIsNull() {
+    @DisplayName("When no operators are available, then result is empty")
+    void whenNoAvailableOperators_thenResultIsEmpty() {
         ValueOperations<String, Boolean> valueOperations = redisTemplateTest.opsForValue();
         valueOperations.set("employee:1:OPERATOR", false);
         valueOperations.set("employee:2:OPERATOR", false);
@@ -70,5 +77,33 @@ public class GetAvailableEmployeeByTypeRedisAdapterTest {
         Optional<Employee> result = adapter.execute(OPERATOR);
 
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @DisplayName("When Redis connection error occurs, then EmployeeServiceException is thrown")
+    void whenRedisConnectionErrorOccurs_thenEmployeeServiceExceptionIsThrown() {
+        when(redisTemplateMock.keys("employee:*:OPERATOR")).thenThrow(new RedisConnectionException("Redis connection error"));
+
+        GetAvailableEmployeeByTypeRedisAdapter adapterWithMock = new GetAvailableEmployeeByTypeRedisAdapter(redisTemplateMock);
+
+        EmployeeServiceException exception = assertThrows(EmployeeServiceException.class, () -> {
+            adapterWithMock.execute(OPERATOR);
+        });
+
+        assertEquals("Redis connection error", exception.getCause().getMessage());
+    }
+
+    @Test
+    @DisplayName("When an unexpected error occurs, then EmployeeServiceException is thrown")
+    void whenUnexpectedErrorOccurs_thenEmployeeServiceExceptionIsThrown() {
+        when(redisTemplateMock.keys("employee:*:OPERATOR")).thenThrow(new RuntimeException("Unexpected error"));
+
+        GetAvailableEmployeeByTypeRedisAdapter adapterWithMock = new GetAvailableEmployeeByTypeRedisAdapter(redisTemplateMock);
+
+        EmployeeServiceException exception = assertThrows(EmployeeServiceException.class, () -> {
+            adapterWithMock.execute(OPERATOR);
+        });
+
+        assertEquals("Unexpected error", exception.getCause().getMessage());
     }
 }
