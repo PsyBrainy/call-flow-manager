@@ -1,6 +1,6 @@
-package com.psybrainy.CallFlowManager.adapter.out.thread;
+package com.psybrainy.CallFlowManager.adapter.out.redis;
 
-import com.psybrainy.CallFlowManager.call.adapter.out.thread.HandleCallThreadAdapter;
+import com.psybrainy.CallFlowManager.call.adapter.out.redis.HandleCallRedisAdapter;
 import com.psybrainy.CallFlowManager.call.application.port.out.HandleCall;
 import com.psybrainy.CallFlowManager.call.domain.Call;
 import com.psybrainy.CallFlowManager.call.domain.Operator;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.doThrow;
 @Import(RedisTestConfig.class)
 @EmbeddedKafka(partitions = 1, topics = "call-topic")
 @DisplayName("Handle Call test")
-public class HandleCallThreadAdapterTest {
+public class HandleCallRedisAdapterTest {
 
     @Autowired
     private RedisTemplate<String, Boolean> redisTemplateTest;
@@ -39,7 +39,7 @@ public class HandleCallThreadAdapterTest {
             keys.forEach(redisTemplateTest::delete);
         }
 
-        adapter = new HandleCallThreadAdapter(redisTemplateTest);
+        adapter = new HandleCallRedisAdapter(redisTemplateTest);
     }
 
 
@@ -65,7 +65,7 @@ public class HandleCallThreadAdapterTest {
 
         doThrow(new RuntimeException("Redis error")).when(redisTemplateMock).opsForValue();
 
-        HandleCallThreadAdapter adapterWithMock = new HandleCallThreadAdapter(redisTemplateMock);
+        HandleCallRedisAdapter adapterWithMock = new HandleCallRedisAdapter(redisTemplateMock);
 
         CallHandlingException exception = assertThrows(CallHandlingException.class, () -> {
             adapterWithMock.execute(call, operator);

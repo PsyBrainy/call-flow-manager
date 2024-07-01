@@ -1,4 +1,4 @@
-package com.psybrainy.CallFlowManager.call.adapter.out.thread;
+package com.psybrainy.CallFlowManager.call.adapter.out.redis;
 
 import com.psybrainy.CallFlowManager.call.application.port.out.HandleCall;
 import com.psybrainy.CallFlowManager.call.domain.Call;
@@ -10,14 +10,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HandleCallThreadAdapter
+public class HandleCallRedisAdapter
         extends AbstractLogger
         implements HandleCall {
 
     private final RedisTemplate<String, Boolean> redisTemplate;
 
     @Autowired
-    public HandleCallThreadAdapter(RedisTemplate<String, Boolean> redisTemplate) {
+    public HandleCallRedisAdapter(RedisTemplate<String, Boolean> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
